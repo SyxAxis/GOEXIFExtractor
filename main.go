@@ -6,6 +6,8 @@
 //   EXIFExtractor -filepath <source-file-path> -csvfile <csvfile.csv>
 //
 //
+//  WARNING : This is the first proper GOlang util I've written! It's very basic and probably very buggy!
+//
 //
 //	Standard EXIF fields
 // 	ImageDescription,Make,Model,Software,DateTime,Artist,Copyright,ExposureTime,FNumber,ISOSpeedRatings,DateTimeOriginal,DateTimeDigitized,FocalLength,CameraOwnerName,BodySerialNumber,LensModel,GPSLatitudeRef,GPSLatitude,GPSLongitudeRef,GPSLongitude
