@@ -221,17 +221,6 @@ func crossCheckEXIFArrayToRequest(fileEXIFData []IfdEntry, wipEXIFFieldList []st
 					}
 					fndFieldVal = "f/" + fndFieldVal
 				}
-				// for the focallength, it's a calculation!
-				// divNums := strings.Split(fileEXIFDataRec.ValueString, "/")
-				// fmt.Printf("\n[%s]\n", divNums[0])
-				// fmt.Printf("[%s]\n", divNums[1])
-				// divNum, _ := strconv.ParseInt(divNums[0], 10, 64)
-				// divDom, _ := strconv.ParseInt(divNums[1], 10, 64)
-				// fndFieldVal = strconv.FormatInt(divNum/divDom, 10)
-				// fmt.Printf(" conv : [%s]", fndFieldVal)
-				// fndFieldVal = fileEXIFDataRec.ValueString
-				// loggo.Println(fileEXIFDataRec.TagName, " - ", fileEXIFDataRec.ValueString)
-
 			}
 		}
 		csvEXIFData = append(csvEXIFData, fndFieldVal)
