@@ -72,9 +72,9 @@ type IfdEntry struct {
 	ValueString string                `json:"value_string"`
 }
 
-func check(e error) {
+func check(e error, msg string) {
 	if e != nil {
-		panic(e)
+		log.Panic(msg)
 	}
 }
 
@@ -175,8 +175,6 @@ func crossCheckEXIFArrayToRequest(fileEXIFData []IfdEntry, wipEXIFFieldList []st
 
 		fndFieldVal := ""
 		for _, fileEXIFDataRec := range fileEXIFData {
-			// fileEXIFDataRec.TagName
-			// fileEXIFDataRec.ValueString
 
 			if EXIFFieldName == fileEXIFDataRec.TagName {
 				// Odd data kludges!!
@@ -195,13 +193,9 @@ func crossCheckEXIFArrayToRequest(fileEXIFData []IfdEntry, wipEXIFFieldList []st
 
 					if strings.Contains(fndFieldVal, "/") && !strings.Contains(fndFieldVal, "1/") {
 						flen01, err := strconv.ParseFloat(strings.Split(fndFieldVal, "/")[0], 64)
-						if err != nil {
-							log.Panic("Cannot convert the source fstop left operator.")
-						}
+						check(err, "Cannot convert the source fstop left operator.")
 						flen02, err := strconv.ParseFloat(strings.Split(fndFieldVal, "/")[1], 64)
-						if err != nil {
-							log.Panic("Cannot convert the source fstop right operator.")
-						}
+						check(err, "Cannot convert the source fstop right operator.")
 						fndFieldVal = fmt.Sprintf("%.1f", flen01/flen02)
 					}
 					fndFieldVal = fndFieldVal + " sec"
@@ -210,13 +204,9 @@ func crossCheckEXIFArrayToRequest(fileEXIFData []IfdEntry, wipEXIFFieldList []st
 					// if there's a slash it's a ratio in fracitonal form and we need it in a decimal without trailing zeros
 					if strings.Contains(fndFieldVal, "/") {
 						flen01, err := strconv.ParseFloat(strings.Split(fndFieldVal, "/")[0], 64)
-						if err != nil {
-							log.Panic("Cannot convert the source fstop left operator.")
-						}
+						check(err, "Cannot convert the source fstop left operator.")
 						flen02, err := strconv.ParseFloat(strings.Split(fndFieldVal, "/")[1], 64)
-						if err != nil {
-							log.Panic("Cannot convert the source fstop right operator.")
-						}
+						check(err, "Cannot convert the source fstop right operator.")
 						fndFieldVal = fmt.Sprintf("%.1f", flen01/flen02)
 					}
 					fndFieldVal = "f/" + fndFieldVal
@@ -247,9 +237,7 @@ func getListFiles(filepathArg string) []string {
 		}
 		return nil
 	})
-	if err != nil {
-		panic(err)
-	}
+	check(err, "Unable to traverse folder structure.")
 
 	return files
 }
@@ -299,7 +287,7 @@ func main() {
 	// create a new CSV file
 	// -------------------------------------------------------------
 	outCSVFile, err := os.Create(csvFileResults)
-	check(err)
+	check(err, "Cannot create CSV output file.")
 
 	// -------------------------------------------------------------
 	// add CSV file header line
@@ -314,7 +302,7 @@ func main() {
 	}
 	outFileInfo := []byte("\"Filename\",\"FolderPath\"," + csvHeaderField + "\n")
 	_, err = outCSVFile.Write(outFileInfo)
-	check(err)
+	check(err, "Cannot write to output CSV file.")
 
 	// -------------------------------------------------------------
 	// scan the source folder for jpg files
@@ -345,7 +333,7 @@ func main() {
 		// -------------------------------------------------------------
 		outFileInfo := []byte("\"" + jpgFileName + "\"" + "," + "\"" + jpgFilePath + "\"")
 		_, err := outCSVFile.Write(outFileInfo)
-		check(err)
+		check(err, "Cannot write to output CSV file.")
 
 		// -------------------------------------------------------------
 		// check the EXIF data from the image file
@@ -358,12 +346,12 @@ func main() {
 		// -------------------------------------------------------------
 		outFileInfo = []byte(csvEXIFDataLine)
 		_, err = outCSVFile.Write(outFileInfo)
-		check(err)
+		check(err, "Cannot write to output CSV file.")
 
 		// new line in output file
 		outFileInfo = []byte("\n")
 		_, err = outCSVFile.Write(outFileInfo)
-		check(err)
+		check(err, "Cannot write to output CSV file.")
 
 	}
 
