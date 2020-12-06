@@ -287,7 +287,7 @@ func main() {
 	// create a new CSV file
 	// -------------------------------------------------------------
 	outCSVFile, err := os.Create(csvFileResults)
-	check(err, "Cannot create CSV output file.")
+	check(err, "Cannot create new CSV output file.")
 
 	// -------------------------------------------------------------
 	// add CSV file header line
@@ -302,7 +302,7 @@ func main() {
 	}
 	outFileInfo := []byte("\"Filename\",\"FolderPath\"," + csvHeaderField + "\n")
 	_, err = outCSVFile.Write(outFileInfo)
-	check(err, "Cannot write to output CSV file.")
+	check(err, "Cannot write header line to output CSV file.")
 
 	// -------------------------------------------------------------
 	// scan the source folder for jpg files
@@ -333,7 +333,7 @@ func main() {
 		// -------------------------------------------------------------
 		outFileInfo := []byte("\"" + jpgFileName + "\"" + "," + "\"" + jpgFilePath + "\"")
 		_, err := outCSVFile.Write(outFileInfo)
-		check(err, "Cannot write to output CSV file.")
+		check(err, "Cannot write JPG filenames to output CSV file.")
 
 		// -------------------------------------------------------------
 		// check the EXIF data from the image file
@@ -346,12 +346,12 @@ func main() {
 		// -------------------------------------------------------------
 		outFileInfo = []byte(csvEXIFDataLine)
 		_, err = outCSVFile.Write(outFileInfo)
-		check(err, "Cannot write to output CSV file.")
+		check(err, "Cannot write raw CSV data to output CSV file.")
 
 		// new line in output file
 		outFileInfo = []byte("\n")
 		_, err = outCSVFile.Write(outFileInfo)
-		check(err, "Cannot write to output CSV file.")
+		check(err, "Cannot write newline to output CSV file.")
 
 	}
 
