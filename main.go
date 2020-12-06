@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"io/ioutil"
@@ -176,26 +177,61 @@ func crossCheckEXIFArrayToRequest(fileEXIFData []IfdEntry, wipEXIFFieldList []st
 		for _, fileEXIFDataRec := range fileEXIFData {
 			// fileEXIFDataRec.TagName
 			// fileEXIFDataRec.ValueString
+
 			if EXIFFieldName == fileEXIFDataRec.TagName {
 				// Odd data kludges!!
+
+				// anything with a trailing "/1" means whole number not fraction
+				if strings.HasSuffix(fileEXIFDataRec.ValueString, "/1") {
+					fndFieldVal = strings.TrimSuffix(fileEXIFDataRec.ValueString, "/1")
+				} else {
+					fndFieldVal = fileEXIFDataRec.ValueString
+				}
+
 				switch fileEXIFDataRec.TagName {
 				case "FocalLength":
-					// for the focallength, it's a calculation!
-					// divNums := strings.Split(fileEXIFDataRec.ValueString, "/")
-					// fmt.Printf("\n[%s]\n", divNums[0])
-					// fmt.Printf("[%s]\n", divNums[1])
-					// divNum, _ := strconv.ParseInt(divNums[0], 10, 64)
-					// divDom, _ := strconv.ParseInt(divNums[1], 10, 64)
-					// fndFieldVal = strconv.FormatInt(divNum/divDom, 10)
-					// fmt.Printf(" conv : [%s]", fndFieldVal)
-					fndFieldVal = fileEXIFDataRec.ValueString
-				default:
-					if strings.HasSuffix(fileEXIFDataRec.ValueString, "/1") {
-						fndFieldVal = strings.TrimSuffix(fileEXIFDataRec.ValueString, "/1")
-					} else {
-						fndFieldVal = fileEXIFDataRec.ValueString
+					fndFieldVal = fndFieldVal + " mm"
+				case "ExposureTime":
+
+					if strings.Contains(fndFieldVal, "/") && !strings.Contains(fndFieldVal, "1/") {
+						flen01, err := strconv.ParseFloat(strings.Split(fndFieldVal, "/")[0], 64)
+						if err != nil {
+							log.Panic("Cannot convert the source fstop left operator.")
+						}
+						flen02, err := strconv.ParseFloat(strings.Split(fndFieldVal, "/")[1], 64)
+						if err != nil {
+							log.Panic("Cannot convert the source fstop right operator.")
+						}
+						fndFieldVal = fmt.Sprintf("%.1f", flen01/flen02)
 					}
+					fndFieldVal = fndFieldVal + " sec"
+
+				case "FNumber":
+					// if there's a slash it's a ratio in fracitonal form and we need it in a decimal without trailing zeros
+					if strings.Contains(fndFieldVal, "/") {
+						flen01, err := strconv.ParseFloat(strings.Split(fndFieldVal, "/")[0], 64)
+						if err != nil {
+							log.Panic("Cannot convert the source fstop left operator.")
+						}
+						flen02, err := strconv.ParseFloat(strings.Split(fndFieldVal, "/")[1], 64)
+						if err != nil {
+							log.Panic("Cannot convert the source fstop right operator.")
+						}
+						fndFieldVal = fmt.Sprintf("%.1f", flen01/flen02)
+					}
+					fndFieldVal = "f/" + fndFieldVal
 				}
+				// for the focallength, it's a calculation!
+				// divNums := strings.Split(fileEXIFDataRec.ValueString, "/")
+				// fmt.Printf("\n[%s]\n", divNums[0])
+				// fmt.Printf("[%s]\n", divNums[1])
+				// divNum, _ := strconv.ParseInt(divNums[0], 10, 64)
+				// divDom, _ := strconv.ParseInt(divNums[1], 10, 64)
+				// fndFieldVal = strconv.FormatInt(divNum/divDom, 10)
+				// fmt.Printf(" conv : [%s]", fndFieldVal)
+				// fndFieldVal = fileEXIFDataRec.ValueString
+				// loggo.Println(fileEXIFDataRec.TagName, " - ", fileEXIFDataRec.ValueString)
+
 			}
 		}
 		csvEXIFData = append(csvEXIFData, fndFieldVal)
