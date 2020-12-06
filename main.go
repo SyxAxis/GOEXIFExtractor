@@ -58,13 +58,14 @@ var (
 	}
 )
 
+// IfdEntry JSON def struct
 type IfdEntry struct {
 	IfdPath     string                `json:"ifd_path"`
 	FqIfdPath   string                `json:"fq_ifd_path"`
 	IfdIndex    int                   `json:"ifd_index"`
-	TagId       uint16                `json:"tag_id"`
+	TagID       uint16                `json:"tag_id"`
 	TagName     string                `json:"tag_name"`
-	TagTypeId   exif.TagTypePrimitive `json:"tag_type_id"`
+	TagTypeID   exif.TagTypePrimitive `json:"tag_type_id"`
 	TagTypeName string                `json:"tag_type_name"`
 	UnitCount   uint32                `json:"unit_count"`
 	Value       interface{}           `json:"value"`
@@ -113,9 +114,8 @@ func getFileExif(filepathArg string) []IfdEntry {
 			if log.Is(err, exif.ErrTagNotFound) {
 				// fmt.Printf("WARNING: Unknown tag: [%s] (%04x)\n", ifdPath, tagId)
 				return nil
-			} else {
-				log.Panic(err)
 			}
+			log.Panic(err)
 		}
 
 		valueString := ""
@@ -143,9 +143,9 @@ func getFileExif(filepathArg string) []IfdEntry {
 			IfdPath:     ifdPath,
 			FqIfdPath:   fqIfdPath,
 			IfdIndex:    ifdIndex,
-			TagId:       tagId,
+			TagID:       tagId,
 			TagName:     it.Name,
-			TagTypeId:   tagType.Type(),
+			TagTypeID:   tagType.Type(),
 			TagTypeName: tagType.Name(),
 			UnitCount:   valueContext.UnitCount(),
 			Value:       value,
