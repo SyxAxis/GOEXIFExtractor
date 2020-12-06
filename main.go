@@ -3,7 +3,7 @@
 //
 // Example command-line:
 //
-//   EXIFExtractor -filepath <source-file-path> -csvfile <csvfile.csv>
+//   EXIFExtractor -filepath <source-file-path>
 //
 //
 //  WARNING : This is the first proper GOlang util I've written! It's very basic and probably very buggy!
@@ -72,6 +72,9 @@ type IfdEntry struct {
 	ValueString string                `json:"value_string"`
 }
 
+// ================================================================================
+//
+// ================================================================================
 func check(e error, msg string) {
 	if e != nil {
 		log.Panic(msg)
@@ -257,7 +260,6 @@ func main() {
 	flag.StringVar(&filepathArg, "filepath", "", "Root folder to scan for JPG image files.")
 	flag.StringVar(&csvFileResults, "csvfile", "output.csv", "CSV output file to hold results.")
 	flag.StringVar(&userEXIFFields, "exif-fields", "ALL", "User selected EXIF fields. Select EXIF fields from [ ImageDescription, Make, Model, Software, DateTime, Artist, Copyright, ExposureTime, FNumber, ISOSpeedRatings, DateTimeOriginal, DateTimeDigitized, FocalLength, CameraOwnerName, BodySerialNumber, LensModel, GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude ], comma separate the list.")
-	// flag.BoolVar(&printLoggingArg, "verbose", false, "Print logging.")
 
 	flag.Parse()
 
@@ -278,10 +280,8 @@ func main() {
 		wipEXIFFieldList = strings.Split(userEXIFFields, ",")
 	}
 
-	// if printLoggingArg == true {
 	cla := log.NewConsoleLogAdapter()
 	log.AddAdapter("console", cla)
-	// }
 
 	// -------------------------------------------------------------
 	// create a new CSV file
@@ -348,7 +348,9 @@ func main() {
 		_, err = outCSVFile.Write(outFileInfo)
 		check(err, "Cannot write raw CSV data to output CSV file.")
 
+		// -------------------------------------------------------------
 		// new line in output file
+		// -------------------------------------------------------------
 		outFileInfo = []byte("\n")
 		_, err = outCSVFile.Write(outFileInfo)
 		check(err, "Cannot write newline to output CSV file.")
