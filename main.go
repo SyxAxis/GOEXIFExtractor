@@ -245,35 +245,10 @@ func getListFiles(filepathArg string) []string {
 	return files
 }
 
-// ================================================================================
-// main()
-// ================================================================================
-func main() {
-	defer func() {
-		if state := recover(); state != nil {
-			err := log.Wrap(state.(error))
-			log.PrintErrorf(err, "Program error.")
-			os.Exit(1)
-		}
-	}()
-
-	flag.StringVar(&filepathArg, "filepath", "", "Root folder to scan for JPG image files.")
-	flag.StringVar(&csvFileResults, "csvfile", "output.csv", "CSV output file to hold results.")
-	flag.StringVar(&userEXIFFields, "exif-fields", "ALL", "User selected EXIF fields. Select EXIF fields from [ ImageDescription, Make, Model, Software, DateTime, Artist, Copyright, ExposureTime, FNumber, ISOSpeedRatings, DateTimeOriginal, DateTimeDigitized, FocalLength, CameraOwnerName, BodySerialNumber, LensModel, GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude ], comma separate the list.")
-
-	flag.Parse()
-
-	if filepathArg == "" {
-		fmt.Printf("Please use [-filepath] option to specify a path to scan for JPG files.\n")
-		os.Exit(1)
-	}
-
-	if csvFileResults == "" {
-		fmt.Printf("Please use [-csvfile] option to specify an output file.\n")
-		os.Exit(1)
-	}
+func initUtility(userEXIFFields, filepathArg, csvFileResults string) error {
 
 	var wipEXIFFieldList []string
+
 	if userEXIFFields == "ALL" {
 		wipEXIFFieldList = constEXIFFields
 	} else {
@@ -357,4 +332,38 @@ func main() {
 
 	}
 
+	return nil
+
+}
+
+// ================================================================================
+// main()
+// ================================================================================
+func main() {
+	defer func() {
+		if state := recover(); state != nil {
+			err := log.Wrap(state.(error))
+			log.PrintErrorf(err, "Program error.")
+			os.Exit(1)
+		}
+	}()
+
+	flag.StringVar(&filepathArg, "filepath", "", "Root folder to scan for JPG image files.")
+	flag.StringVar(&csvFileResults, "csvfile", "output.csv", "CSV output file to hold results.")
+	flag.StringVar(&userEXIFFields, "exif-fields", "ALL", "User selected EXIF fields. Select EXIF fields from [ ImageDescription, Make, Model, Software, DateTime, Artist, Copyright, ExposureTime, FNumber, ISOSpeedRatings, DateTimeOriginal, DateTimeDigitized, FocalLength, CameraOwnerName, BodySerialNumber, LensModel, GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude ], comma separate the list.")
+
+	flag.Parse()
+
+	if filepathArg == "" {
+		fmt.Printf("Please use [-filepath] option to specify a path to scan for JPG files.\n")
+		os.Exit(1)
+	}
+
+	if csvFileResults == "" {
+		fmt.Printf("Please use [-csvfile] option to specify an output file.\n")
+		os.Exit(1)
+	}
+
+	err := initUtility(userEXIFFields, filepathArg, csvFileResults)
+	log.PanicIf(err)
 }
